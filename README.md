@@ -32,6 +32,7 @@ $ docker images
 ```bash
 $ docker run -p 8080:8080 -v $(pwd)/app:/app -e DEBUG=true ws-flask-app:local
 ```
+http://0.0.0.0:8081
 
 ## Artifact Registry にイメージをアップ
 
@@ -50,7 +51,7 @@ asia-northeast1-docker.pkg.dev/xxxxxxxxxxx/repo-xxxxxx-xxxxxxxx/ws-flask-app:lat
 記入欄
 
 ```plain
-xxxxx/ws-flask-app:latest
+docker build -tasia-northeast1-docker.pkg.dev/env95-cloudruntraining/repo-masaki-sasaki/ws-flask-app:latest .
 ```
 
 ### イメージのビルド
@@ -86,7 +87,7 @@ $ docker push asia-northeast1-docker.pkg.dev/xxxxxxxxxxx/repo-xxxxxx-xxxxxxxx/ws
 記入欄
 
 ```plain
-docker push xxxxx/ws-flask-app:latest
+docker push asia-northeast1-docker.pkg.dev/env95-cloudruntraining/repo-masaki-sasaki/ws-flask-app:latest
 ```
 
 ## Cloud Runにデプロイ
@@ -110,9 +111,9 @@ $ gcloud run deploy cloud-run-xxxxx \
 記入欄
 
 ```bash
-$ gcloud run deploy cloud-run-xxxxx \
-    --image xxxxxxx \
-    --region asia-northeast1
+$ gcloud run deploy cloud-run-masaki-sasaki \
+    --image asia-northeast1-docker.pkg.dev/env95-cloudruntraining/repo-masaki-sasaki/ws-flask-app:latest \
+    --region asia-northeast1 \
     --port 8080
 ```
 
@@ -131,5 +132,5 @@ $ gcloud run services proxy cloud-run-xxxxxx --region asia-northeast1
 記入欄
 
 ```bash
-$ gcloud run services proxy xxxxxx --region asia-northeast1
+$ gcloud run services proxy cloud-run-masaki-sasaki --region asia-northeast1 --port 8082 --project env95-cloudruntraining    
 ```

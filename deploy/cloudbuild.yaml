@@ -5,9 +5,9 @@
 # Cloud Build によって自動的に提供される組み込みの置換変数です。
 substitutions:
   _LOCATION: 'asia-northeast1'            # Artifact Registry と Cloud Run のリージョン
-  _ARTIFACT_REGISTRY_REPO: 'repo-{name}'  # Artifact Registry のリポジトリ名
+  _ARTIFACT_REGISTRY_REPO: 'repo-masaki-sasaki'  # Artifact Registry のリポジトリ名
   _IMAGE_NAME: 'ws-flask-app'             # Docker イメージ名
-  _SERVICE_NAME: 'cloud-run-{name}'       # Cloud Run のサービス名
+  _SERVICE_NAME: 'cloud-run-masaki-sasaki'       # Cloud Run のサービス名
 
 options:
   logging: CLOUD_LOGGING_ONLY
