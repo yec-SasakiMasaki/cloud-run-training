@@ -1,0 +1,43 @@
+# Cloud Build 設定ファイル (cloudbuild.yaml)
+
+# 置換変数: これらの値はビルド実行時に設定できますが、ここでは一般的な値を定義しています。
+# $PROJECT_ID, $SHORT_SHA, $BRANCH_NAME, $TAG_NAME などは
+# Cloud Build によって自動的に提供される組み込みの置換変数です。
+substitutions:
+  _LOCATION: 'asia-northeast1'            # Artifact Registry と Cloud Run のリージョン
+  _ARTIFACT_REGISTRY_REPO: 'repo-{name}'  # Artifact Registry のリポジトリ名
+  _IMAGE_NAME: 'ws-flask-app'             # Docker イメージ名
+  _SERVICE_NAME: 'cloud-run-{name}'       # Cloud Run のサービス名
+
+options:
+  logging: CLOUD_LOGGING_ONLY
+
+steps:
+  # 1. Docker イメージをビルド
+  #    タグにはコミットSHAの短縮版 ($SHORT_SHA) を使用します。
+  #    これにより、各ビルドで一意のイメージバージョンが作成されます。
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'build'
+      - '-t'
+      - '${_LOCATION}-docker.pkg.dev/$PROJECT_ID/${_ARTIFACT_REGISTRY_REPO}/${_IMAGE_NAME}:$SHORT_SHA'
+      - '.'
+    id: 'Build Docker Image'
+
+  # 2. Docker イメージを Artifact Registry にプッシュ
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'push'
+      - '${_LOCATION}-docker.pkg.dev/$PROJECT_ID/${_ARTIFACT_REGISTRY_REPO}/${_IMAGE_NAME}:$SHORT_SHA'
+    id: 'Push Docker Image'
+
+  # 3. Docker イメージを Cloud Run にデプロイ
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: 'gcloud'
+    args:
+      - 'run'
+      - 'deploy'
+      - '${_SERVICE_NAME}' # Cloud Run サービス名
+      - '--image=${_LOCATION}-docker.pkg.dev/$PROJECT_ID/${_ARTIFACT_REGISTRY_REPO}/${_IMAGE_NAME}:$SHORT_SHA' # デプロイするイメージ
+      - '--region=${_LOCATION}'                               # Cloud Run サービスのリージョン
+    id: 'Deploy to Cloud Run'
